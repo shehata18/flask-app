@@ -43,6 +43,30 @@ pipeline {
                         keyFileVariable: 'SSH_KEY',
                         usernameVariable: 'SSH_USER'
                     )
+                ]) {
+                    sh '''
+                    scp -i $SSH_KEY -o StrictHostKeyChecking=no ${ZIP_NAME} \
+                        $SSH_USER@${SERVER_IP}:/home/mohamed/
+
+                    ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@${SERVER_IP} "
+                        unzip -o /home/mohamed/${ZIP_NAME} -d ${APP_DIR} &&
+                        cd ${APP_DIR} &&
+                        venv/bin/pip install -r requirements.txt &&
+                        sudo systemctl restart flask-app
+                    "
+                    '''
+                }
+            }
+    
+
+
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'ssh-key',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
                 ]) {{
                     sh '''
                     scp -i $SSH_KEY -o StrictHostKeyChecking=no ${ZIP_NAME} \
@@ -55,6 +79,7 @@ pipeline {
                         sudo systemctl restart flask-app
                     "
                     '''
+                }
                 }
             }
         }
