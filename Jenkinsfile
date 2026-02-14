@@ -16,20 +16,7 @@ pipeline {
             }
         }
 
-        stage('Debug Env') {
-            steps {
-                sh '''
-                whoami
-                which python3
-                python3 --version
-                which pip
-                env
-                '''
-            }
-        }
-
-
-        stage('Install Dependencies') {
+        stage('Build & Test') {
             steps {
                 sh '''
                 python3 -m venv venv || true
@@ -37,19 +24,8 @@ pipeline {
                 venv/bin/pip install pytest
                 venv/bin/pytest
                 '''
-
             }
         }
-
-        stage('Run Tests') {
-            steps {
-                sh '''
-                venv/bin/pytest
-                pytest
-                '''
-            }
-        }
-
 
         stage('Package App') {
             steps {
@@ -75,8 +51,7 @@ pipeline {
                     ssh -i $SSH_KEY -o StrictHostKeyChecking=no $SSH_USER@${SERVER_IP} << EOF
                         unzip -o /home/mohamed/${ZIP_NAME} -d ${APP_DIR}
                         cd ${APP_DIR}
-                        source venv/bin/activate
-                        pip install -r requirements.txt
+                        venv/bin/pip install -r requirements.txt
                         sudo systemctl restart flask-app
                     EOF
                     '''
