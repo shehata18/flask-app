@@ -16,13 +16,27 @@ pipeline {
             }
         }
 
+        stage('Debug Env') {
+            steps {
+                sh '''
+                whoami
+                which python3
+                python3 --version
+                which pip
+                env
+                '''
+            }
+        }
+
+
         stage('Install Dependencies') {
             steps {
                 sh '''
                 python3 -m venv venv || true
                 source venv/bin/activate
-                pip install -r requirements.txt
-                pip install pytest
+                python3 -m pip install --upgrade pip
+                python3 -m pip install -r requirements.txt
+                python3 -m pip install pytest
                 '''
             }
         }
@@ -35,6 +49,7 @@ pipeline {
                 '''
             }
         }
+
 
         stage('Package App') {
             steps {
