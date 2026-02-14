@@ -32,14 +32,12 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 sh '''
-                #!/bin/bash
-                set -e
                 python3 -m venv venv || true
-                source venv/bin/activate
-                python3 -m pip install --upgrade pip
-                python3 -m pip install -r requirements.txt
-                python3 -m pip install pytest
+                venv/bin/pip install -r requirements.txt
+                venv/bin/pip install pytest
+                venv/bin/pytest
                 '''
+
             }
         }
 
